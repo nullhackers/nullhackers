@@ -94,7 +94,7 @@ export default function Hero() {
           <h1 className="hero__title mono">
             <span className="hero__title-gradient">Nullhackers</span>
           </h1>
-          <p className="hero__subtitle">Find What Others Miss</p>
+          <p className="hero__subtitle">DECODE THE DIGITAL WORLD</p>
           <SocialLinks className="hero__socials" />
         </div>
 
