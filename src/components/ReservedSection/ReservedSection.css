@@ -1,0 +1,22 @@
+/* ============================================
+   RESERVED SECTION (Section 4 / AI)
+   ============================================ */
+
+.reserved-section {
+  background: var(--bg-secondary);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reserved-section__glow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.05), transparent 70%);
+  pointer-events: none;
+}

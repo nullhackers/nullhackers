@@ -1,0 +1,334 @@
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg-primary);
+  padding: var(--navbar-height) 24px 0;
+}
+
+/* Star canvas */
+.hero__stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Radial glows */
+.hero__glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(80px);
+}
+
+.hero__glow--blue {
+  width: 600px;
+  height: 600px;
+  top: 10%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(79, 140, 255, 0.12), transparent 70%);
+}
+
+.hero__glow--purple {
+  width: 500px;
+  height: 500px;
+  bottom: 15%;
+  right: 15%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+}
+
+/* Orbit rings */
+.hero__orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(79, 140, 255, 0.06);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero__orbit--1 {
+  width: 700px;
+  height: 700px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbit-spin 60s linear infinite;
+}
+
+.hero__orbit--2 {
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbit-spin 45s linear infinite reverse;
+  border-color: rgba(139, 92, 246, 0.05);
+}
+
+@keyframes orbit-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Content */
+.hero__content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 40px;
+  max-width: 720px;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hero__content.visible {
+  opacity: 1;
+}
+
+/* Terminal */
+.hero__terminal-wrap {
+  width: 100%;
+  max-width: 560px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.hero__terminal-wrap.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.terminal {
+  width: 100%;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: rgba(7, 11, 24, 0.8);
+  border: 1px solid rgba(79, 140, 255, 0.15);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(61, 255, 176, 0.03);
+}
+
+[data-theme="light"] .terminal {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(51, 102, 230, 0.2);
+}
+
+.terminal__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.terminal__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal__dot--red { background: #FF5F57; }
+.terminal__dot--yellow { background: #FEBC2E; }
+.terminal__dot--green { background: #28C840; }
+
+.terminal__title {
+  margin-left: 8px;
+  font-size: 0.7rem;
+  color: rgba(248, 250, 252, 0.4);
+}
+
+.terminal__body {
+  padding: 20px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.terminal__line {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+}
+
+.terminal__text {
+  color: var(--accent-terminal);
+}
+
+[data-theme="light"] .terminal__text {
+  color: #3DFFB0;
+}
+
+.terminal__cursor {
+  color: var(--accent-terminal);
+  opacity: 0;
+  margin-left: 1px;
+  font-size: 0.85em;
+}
+
+[data-theme="light"] .terminal__cursor {
+  color: #3DFFB0;
+}
+
+.terminal__cursor.visible {
+  opacity: 1;
+}
+
+/* Info block */
+.hero__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+}
+
+.hero__info.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero__title {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.hero__title-gradient {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__subtitle {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Social links */
+.social-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.social-links__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: transform var(--transition-fast), color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.social-links__item:hover {
+  transform: translateY(-3px);
+  color: var(--accent-blue);
+  box-shadow: 0 4px 20px rgba(79, 140, 255, 0.2);
+}
+
+/* Scroll indicator */
+.hero__scroll {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+}
+
+.hero__scroll.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.scroll-indicator:hover {
+  color: var(--text-muted);
+}
+
+.scroll-indicator__text {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.scroll-indicator__arrow {
+  animation: bounce-arrow 2s ease-in-out infinite;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero__title {
+    font-size: 2rem;
+  }
+  .hero__subtitle {
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+  .terminal__body {
+    padding: 14px;
+    min-height: 110px;
+  }
+  .terminal__line {
+    font-size: 0.78rem;
+  }
+  .hero__glow--blue {
+    width: 300px;
+    height: 300px;
+  }
+  .hero__glow--purple {
+    width: 250px;
+    height: 250px;
+  }
+  .hero__orbit--1 {
+    width: 400px;
+    height: 400px;
+  }
+  .hero__orbit--2 {
+    width: 300px;
+    height: 300px;
+  }
+}

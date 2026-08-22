@@ -1,0 +1,42 @@
+/* ============================================
+   INTERACTIVE SECTION (Section 2 / About)
+   ============================================ */
+
+.interactive-section {
+  position: relative;
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.particle-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.interactive-section__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.06), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content-placeholder {
+  position: relative;
+  z-index: 2;
+  min-height: 300px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  border-radius: var(--border-radius-lg);
+}

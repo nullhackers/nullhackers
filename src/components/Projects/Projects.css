@@ -1,0 +1,202 @@
+/* ============================================
+   PROJECTS SECTION (Section 3)
+   ============================================ */
+
+.projects-section {
+  background: var(--bg-primary);
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
+.projects-section__glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(79, 140, 255, 0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.projects-section__header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.projects-section__title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.projects-section__subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+/* Card */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal),
+    background var(--transition-normal);
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(79, 140, 255, 0.12);
+  background: var(--bg-elevated-hover);
+}
+
+.project-card__logo {
+  font-size: 2rem;
+  margin-bottom: 16px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-terminal-dim);
+  border-radius: var(--border-radius-md);
+}
+
+.project-card__name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.project-card__desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.project-card__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.project-card__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: transform var(--transition-fast), background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.project-card__btn--live {
+  background: rgba(79, 140, 255, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(79, 140, 255, 0.2);
+}
+
+.project-card__btn--live:hover {
+  background: rgba(79, 140, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.project-card__btn--github {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--accent-purple);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.project-card__btn--github:hover {
+  background: rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pagination__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: var(--border-radius-xl);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color var(--transition-fast), background var(--transition-fast),
+    transform var(--transition-fast);
+  cursor: pointer;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pagination__info {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination__current {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .projects-section__title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .projects-section__title {
+    font-size: 1.6rem;
+  }
+  .projects-section__header {
+    margin-bottom: 40px;
+  }
+  .pagination__btn {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+}

@@ -1,18 +1,21 @@
-import NullhackersLogo from './assets/Null-logo.png';
-import './App.css'
+import Navbar from './components/Navbar/Navbar';
+import Hero from './components/Hero/Hero';
+import InteractiveSection from './components/InteractiveSection/InteractiveSection';
+import ProjectsSection from './components/Projects/ProjectsSection';
+import ReservedSection from './components/ReservedSection/ReservedSection';
+import FinalSection from './components/FinalSection/FinalSection';
 
-function App() {
-
+export default function App() {
   return (
     <>
-      <div>
-          <img src={NullhackersLogo} className="logo" alt="nullhackers logo" />
-      </div>
-      <h2>Nullhackers</h2>
-      <h1>Under Development</h1>
-      <p class="blink">We are Coming Soon</p>
+      <Navbar />
+      <main>
+        <Hero />
+        <InteractiveSection />
+        <ProjectsSection />
+        <ReservedSection />
+        <FinalSection />
+      </main>
     </>
-  )
+  );
 }
-
-export default App

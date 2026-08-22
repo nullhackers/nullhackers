@@ -1,0 +1,75 @@
+/* ============================================
+   VARIABLES.CSS — Design Token System
+   All color tokens for dark & light themes
+   ============================================ */
+
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary: #03050D;
+  --bg-secondary: #070B18;
+  --bg-elevated: #0B1020;
+  --bg-elevated-hover: #0F1530;
+
+  /* Accent colors */
+  --accent-blue: #4F8CFF;
+  --accent-purple: #8B5CF6;
+  --accent-violet: #A855F7;
+  --accent-terminal: #3DFFB0;
+  --accent-terminal-dim: rgba(61, 255, 176, 0.15);
+
+  /* Text */
+  --text-primary: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+
+  /* Glass */
+  --glass-bg: rgba(11, 16, 32, 0.6);
+  --glass-border: rgba(79, 140, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-violet));
+  --gradient-glow-blue: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(79, 140, 255, 0.06), transparent 60%);
+  --gradient-glow-purple: radial-gradient(600px circle at 70% 30%, rgba(139, 92, 246, 0.08), transparent 60%);
+
+  /* Misc */
+  --navbar-height: 72px;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #EEF1F7;
+  --bg-elevated: #FFFFFF;
+  --bg-elevated-hover: #F1F5F9;
+
+  /* Accent colors */
+  --accent-blue: #3366E6;
+  --accent-purple: #7C3AED;
+  --accent-violet: #9333EA;
+  --accent-terminal: #0FA968;
+  --accent-terminal-dim: rgba(15, 169, 104, 0.1);
+
+  /* Text */
+  --text-primary: #0B1020;
+  --text-muted: #475569;
+  --text-dim: #94A3B8;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(51, 102, 230, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-violet));
+  --gradient-glow-blue: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(51, 102, 230, 0.06), transparent 60%);
+  --gradient-glow-purple: radial-gradient(600px circle at 70% 30%, rgba(124, 58, 237, 0.06), transparent 60%);
+}
