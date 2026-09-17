@@ -3,7 +3,7 @@ import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import './Navbar.css';
 
 const navLinks = [
-  { label: 'About', target: 'interactive-section' },
+  { label: 'About', target: 'about-us' },
   { label: 'AI', target: 'reserved-section' },
   { label: 'Contact Us', target: 'final-section' },
 ];

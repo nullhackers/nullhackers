@@ -1,8 +1,9 @@
 import Navbar from './components/Navbar/Navbar';
 import Hero from './components/Hero/Hero';
-import InteractiveSection from './components/InteractiveSection/InteractiveSection';
+import YouTubeSection from './components/YouTube/YouTubeSection';
 import ProjectsSection from './components/Projects/ProjectsSection';
 import ReservedSection from './components/ReservedSection/ReservedSection';
+import AboutUs from './components/AboutUs/AboutUs';
 import FinalSection from './components/FinalSection/FinalSection';
 
 export default function App() {
@@ -11,11 +12,14 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
-        <InteractiveSection />
+        <YouTubeSection />
         <ProjectsSection />
         <ReservedSection />
+        <AboutUs />
         <FinalSection />
       </main>
     </>
   );
 }
+
+
