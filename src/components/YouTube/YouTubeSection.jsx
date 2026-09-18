@@ -1,56 +1,6 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { getYouTubeData } from '../../services/youtubeService';
 import './YouTubeSection.css';
-
-// ── Real YouTube channel data (scraped 2026-09-17) ──
-const CHANNEL = {
-  name: 'nullhackers',
-  handle: '@nullhackers',
-  subscribers: '1.36K',
-  totalViews: '314K+',
-  avatar: 'https://yt3.googleusercontent.com/BqjgDoytW9QIlWfLtMPvLf53_F82MzZ9ajPyzLGZl60QwkhEyRKF9h7_9mOxhMLAuJkgctkiciI=s176-c-k-c0x00ffffff-no-rj',
-  url: 'https://youtube.com/@nullhackers',
-  description:
-    'Discover useful websites, AI tools, and the latest technology tips with nullhackers. We explore powerful tools, free AI resources, and practical tech discoveries to help you get more out of the internet.',
-};
-
-const VIDEOS = [
-  {
-    id: 'coJT8RyxIYY',
-    title: 'Get Access To DeepSeek V4.1 Flash For Free (No CC Required)',
-    views: '188 views',
-    date: '4 hours ago',
-  },
-  {
-    id: '1IvhBEQFTtI',
-    title: 'FREE AI Video Generator: Text to Video + Image to Video | 100% Free, No Sign Up | No Card',
-    views: '7.4K views',
-    date: '1 day ago',
-  },
-  {
-    id: 'xk7jnpEag1M',
-    title: 'How to Use OPENAI GPT-6 Astra for FREE | 3 Methods That Works [100% Working ]',
-    views: '19K views',
-    date: '4 days ago',
-  },
-  {
-    id: 'bjEYVh4pV6w',
-    title: 'Unlimited AI Video Generation, Zero Cost, No Card Required',
-    views: '2.4K views',
-    date: '5 days ago',
-  },
-  {
-    id: 'O0xMGsJ2i_U',
-    title: 'Unlimited AI Videos, Images & Voice for FREE -- No Clickbait, No Credit Card',
-    views: '8.7K views',
-    date: '6 days ago',
-  },
-  {
-    id: 'iUTXjrs40pg',
-    title: 'All AI Models in One Place: Opus 5, GPT-5.6 Luna, Grok 4.6, Gemini 3.6 and other',
-    views: '27K views',
-    date: '8 days ago',
-  },
-];
 
 /* ── YouTube SVG icons ── */
 const YouTubeIcon = ({ size = 24 }) => (
@@ -82,9 +32,49 @@ const ClockIcon = () => (
 );
 
 /* ═══════════════════════════════════════════════
+   CUSTOM HOOK: useYouTubeData
+   Fetches channel stats + latest videos from the
+   YouTube Data API v3, with 12-hour localStorage cache.
+   ═══════════════════════════════════════════════ */
+function useYouTubeData() {
+  // Read cached data immediately so the section renders without waiting for the async API call
+  const cached = (() => {
+    try {
+      const raw = localStorage.getItem('nullhackers_yt_cache');
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  })();
+
+  const [channel, setChannel] = useState(cached?.channel || null);
+  const [videos, setVideos] = useState(cached?.videos || []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const data = await getYouTubeData();
+        if (!cancelled) {
+          setChannel(data.channel);
+          setVideos(data.videos);
+        }
+      } catch (err) {
+        console.error('[YouTubeSection] Failed to load data:', err);
+        // Keep the default fallback data already in state
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  return { channel, videos };
+}
+
+/* ═══════════════════════════════════════════════
    CREATOR SECTION
    ═══════════════════════════════════════════════ */
-function CreatorSection() {
+function CreatorSection({ channel }) {
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -104,6 +94,8 @@ function CreatorSection() {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
+
+  if (!channel) return null;
 
   return (
     <section
@@ -130,8 +122,8 @@ function CreatorSection() {
             {/* Avatar */}
             <div className="yt-creator__avatar-wrap">
               <img
-                src={CHANNEL.avatar}
-                alt={CHANNEL.name}
+                src={channel.avatar}
+                alt={channel.name}
                 className="yt-creator__avatar"
                 width="100"
                 height="100"
@@ -143,19 +135,19 @@ function CreatorSection() {
             {/* Info */}
             <div className="yt-creator__info">
               <div className="yt-creator__name-row">
-                <h3 className="yt-creator__name">{CHANNEL.name}</h3>
-                <span className="yt-creator__handle mono">{CHANNEL.handle}</span>
+                <h3 className="yt-creator__name">{channel.name}</h3>
+                <span className="yt-creator__handle mono">{channel.handle}</span>
               </div>
 
               {/* Stats */}
               <div className="yt-creator__stats">
                 <div className="yt-creator__stat">
-                  <span className="yt-creator__stat-value">{CHANNEL.subscribers}</span>
+                  <span className="yt-creator__stat-value">{channel.subscribers}</span>
                   <span className="yt-creator__stat-label">Subscribers</span>
                 </div>
                 <div className="yt-creator__stat-divider" />
                 <div className="yt-creator__stat">
-                  <span className="yt-creator__stat-value">{CHANNEL.totalViews}</span>
+                  <span className="yt-creator__stat-value">{channel.totalViews}</span>
                   <span className="yt-creator__stat-label">Total Views</span>
                 </div>
                 <div className="yt-creator__stat-divider" />
@@ -168,12 +160,14 @@ function CreatorSection() {
           </div>
 
           {/* Description */}
-          <p className="yt-creator__description">{CHANNEL.description}</p>
+          <p className="yt-creator__description">
+            Discover useful websites, AI tools, and the latest technology tips with nullhackers. We explore powerful tools, free AI resources, and practical tech discoveries to help you get more out of the internet.
+          </p>
 
           {/* CTA row */}
           <div className="yt-creator__cta-row">
             <a
-              href={`${CHANNEL.url}?sub_confirmation=1`}
+              href={`${channel.url}?sub_confirmation=1`}
               target="_blank"
               rel="noopener noreferrer"
               className="yt-creator__subscribe-btn"
@@ -194,7 +188,7 @@ function CreatorSection() {
 /* ═══════════════════════════════════════════════
    VIDEO SHOWCASE SECTION
    ═══════════════════════════════════════════════ */
-function VideoShowcase() {
+function VideoShowcase({ videos }) {
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -206,6 +200,8 @@ function VideoShowcase() {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
+
+  if (!videos || videos.length === 0) return null;
 
   return (
     <section className="yt-videos" id="youtube-videos" ref={sectionRef}>
@@ -223,7 +219,7 @@ function VideoShowcase() {
 
         {/* Video grid */}
         <div className="yt-videos__grid">
-          {VIDEOS.map((video, i) => (
+          {videos.map((video, i) => (
             <a
               key={video.id}
               href={`https://www.youtube.com/watch?v=${video.id}`}
@@ -276,10 +272,12 @@ function VideoShowcase() {
    COMBINED EXPORT
    ═══════════════════════════════════════════════ */
 export default function YouTubeSection() {
+  const { channel, videos } = useYouTubeData();
+
   return (
     <>
-      <CreatorSection />
-      <VideoShowcase />
+      <CreatorSection channel={channel} />
+      <VideoShowcase videos={videos} />
     </>
   );
 }
