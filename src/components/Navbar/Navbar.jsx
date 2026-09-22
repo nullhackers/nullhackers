@@ -43,7 +43,7 @@ export default function Navbar() {
         {/* Logo */}
         <a href="#" className="navbar__brand" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           <img src="/logo.svg" alt="Nullhackers logo" className="navbar__logo" width="36" height="36" />
-          <span className="navbar__wordmark mono">Nullhackers</span>
+          <span className="navbar__wordmark mono">nullhackers</span>
         </a>
 
         {/* Desktop nav links */}

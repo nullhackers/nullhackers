@@ -38,8 +38,8 @@ export default function FinalSection() {
           {/* Right half */}
           <div className="final-section__right">
             <p className="final-section__contact-label mono">Get in touch</p>
-            <a href="mailto:nullhackersss@gmail.com" className="final-section__email mono">
-              nullhackersss@gmail.com
+            <a href="mailto:business.nullhackers@gmail.com" className="final-section__email mono">
+              business.nullhackers@gmail.com
             </a>
           </div>
         </div>
