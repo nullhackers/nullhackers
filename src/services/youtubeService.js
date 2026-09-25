@@ -134,6 +134,32 @@ function isCacheFresh(cache) {
 }
 
 /* ═══════════════════════════════════════════════
+   DURATION HELPERS
+   ═══════════════════════════════════════════════ */
+
+/**
+ * Parse an ISO 8601 duration string (from YouTube contentDetails.duration)
+ * into total seconds.  e.g. "PT1M30S" → 90, "PT5M" → 300, "PT1H2M3S" → 3723
+ */
+function parseDurationToSeconds(isoDuration) {
+  if (!isoDuration) return 0;
+  const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  const hours = parseInt(match[1] || '0', 10);
+  const minutes = parseInt(match[2] || '0', 10);
+  const seconds = parseInt(match[3] || '0', 10);
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * A YouTube Short is typically ≤ 60 seconds.
+ * We use a threshold of 65 seconds to be safe.
+ */
+function isShort(durationISO) {
+  return parseDurationToSeconds(durationISO) <= 65;
+}
+
+/* ═══════════════════════════════════════════════
    API FETCH FUNCTIONS
    ═══════════════════════════════════════════════ */
 
@@ -168,18 +194,24 @@ async function fetchChannelStats() {
 }
 
 /**
- * Fetch the latest 6 videos from the channel's uploads playlist (newest first).
- * Uses playlistItems (1 quota unit) instead of search (100 quota units).
- * Then fetches view counts for each video.
+ * Fetch recent uploads from the channel, filter out Shorts,
+ * and return two lists: latestVideos (3 newest) and popularVideos (3 most-viewed).
+ *
+ * Strategy:
+ *   1. Get the latest 20 uploads from the uploads playlist.
+ *   2. Fetch contentDetails (duration) + statistics (viewCount) for each.
+ *   3. Filter out Shorts (duration ≤ 65s).
+ *   4. From the long-form set, pick 3 newest → latestVideos.
+ *   5. From the remaining long-form set (excluding duplicates), pick 3 most-viewed → popularVideos.
  */
-async function fetchLatestVideos() {
+async function fetchVideos() {
   // Every YouTube channel has an "uploads" playlist: replace "UC" prefix with "UU"
   const uploadsPlaylistId = 'UU' + CHANNEL_ID.substring(2);
 
-  // Step 1: Get latest 6 uploads from the playlist (already newest-first)
+  // Step 1: Get latest 20 uploads from the playlist (already newest-first)
   const playlistUrl =
     `${YT_API_BASE}/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}` +
-    `&maxResults=6&key=${API_KEY}`;
+    `&maxResults=20&key=${API_KEY}`;
   const playlistRes = await fetch(playlistUrl);
   if (!playlistRes.ok) throw new Error(`PlaylistItems API error: ${playlistRes.status}`);
   const playlistData = await playlistRes.json();
@@ -192,29 +224,66 @@ async function fetchLatestVideos() {
     .map((item) => item.snippet.resourceId.videoId)
     .join(',');
 
-  // Step 2: Get statistics for those videos
-  const statsUrl =
-    `${YT_API_BASE}/videos?part=statistics&id=${videoIds}&key=${API_KEY}`;
-  const statsRes = await fetch(statsUrl);
-  if (!statsRes.ok) throw new Error(`Videos API error: ${statsRes.status}`);
-  const statsData = await statsRes.json();
+  // Step 2: Get contentDetails (for duration) + statistics (for viewCount)
+  const detailsUrl =
+    `${YT_API_BASE}/videos?part=contentDetails,statistics&id=${videoIds}&key=${API_KEY}`;
+  const detailsRes = await fetch(detailsUrl);
+  if (!detailsRes.ok) throw new Error(`Videos API error: ${detailsRes.status}`);
+  const detailsData = await detailsRes.json();
 
-  // Build a map of videoId → viewCount
-  const viewMap = {};
-  if (statsData.items) {
-    for (const item of statsData.items) {
-      viewMap[item.id] = item.statistics?.viewCount || '0';
+  // Build maps: videoId → { viewCount, duration }
+  const detailsMap = {};
+  if (detailsData.items) {
+    for (const item of detailsData.items) {
+      detailsMap[item.id] = {
+        viewCount: item.statistics?.viewCount || '0',
+        duration: item.contentDetails?.duration || '',
+      };
     }
   }
 
-  // Step 3: Combine (order preserved from playlist = newest first)
-  return playlistData.items.map((item) => ({
-    id: item.snippet.resourceId.videoId,
-    title: item.snippet.title,
-    views: formatViews(viewMap[item.snippet.resourceId.videoId] || '0'),
-    date: timeAgo(item.snippet.publishedAt),
-    publishedAt: item.snippet.publishedAt,
-  }));
+  // Step 3: Build enriched list, filtering out Shorts
+  const longFormVideos = playlistData.items
+    .map((item) => {
+      const videoId = item.snippet.resourceId.videoId;
+      const details = detailsMap[videoId] || { viewCount: '0', duration: '' };
+      return {
+        id: videoId,
+        title: item.snippet.title,
+        rawViews: parseInt(details.viewCount, 10) || 0,
+        views: formatViews(details.viewCount),
+        date: timeAgo(item.snippet.publishedAt),
+        publishedAt: item.snippet.publishedAt,
+        duration: details.duration,
+      };
+    })
+    .filter((v) => !isShort(v.duration));
+
+  // Step 4: Latest 3 (playlist is already newest-first, so just take the first 3)
+  const latestVideos = longFormVideos.slice(0, 3);
+  const latestIds = new Set(latestVideos.map((v) => v.id));
+
+  // Step 5: Popular 3 — from remaining videos (excluding ones already in latest), sorted by views
+  const remainingForPopular = longFormVideos.filter((v) => !latestIds.has(v.id));
+  const popularVideos = [...remainingForPopular]
+    .sort((a, b) => b.rawViews - a.rawViews)
+    .slice(0, 3);
+
+  // If we don't have enough unique popular videos (channel has few uploads),
+  // fill from the full list sorted by views
+  if (popularVideos.length < 3) {
+    const popularIds = new Set(popularVideos.map((v) => v.id));
+    const allByViews = [...longFormVideos].sort((a, b) => b.rawViews - a.rawViews);
+    for (const v of allByViews) {
+      if (popularVideos.length >= 3) break;
+      if (!popularIds.has(v.id)) {
+        popularVideos.push(v);
+        popularIds.add(v.id);
+      }
+    }
+  }
+
+  return { latestVideos, popularVideos };
 }
 
 /* ═══════════════════════════════════════════════
@@ -226,13 +295,17 @@ async function fetchLatestVideos() {
  * Returns cached data if < 12 hours old, otherwise fetches fresh data.
  * Falls back to stale cache or hardcoded defaults on error.
  *
- * @returns {{ channel: object, videos: object[] }}
+ * @returns {{ channel: object, latestVideos: object[], popularVideos: object[] }}
  */
 export async function getYouTubeData() {
   // Check cache first
   const cache = readCache();
   if (cache && isCacheFresh(cache)) {
-    return { channel: cache.channel, videos: cache.videos };
+    return {
+      channel: cache.channel,
+      latestVideos: cache.latestVideos || cache.videos || [],
+      popularVideos: cache.popularVideos || [],
+    };
   }
 
   // No API key → return fallback (or stale cache)
@@ -240,24 +313,36 @@ export async function getYouTubeData() {
     console.warn(
       '[YouTubeService] No API key found. Set VITE_YOUTUBE_API_KEY in .env'
     );
-    if (cache) return { channel: cache.channel, videos: cache.videos };
-    return { channel: FALLBACK_CHANNEL, videos: [] };
+    if (cache) {
+      return {
+        channel: cache.channel,
+        latestVideos: cache.latestVideos || cache.videos || [],
+        popularVideos: cache.popularVideos || [],
+      };
+    }
+    return { channel: FALLBACK_CHANNEL, latestVideos: [], popularVideos: [] };
   }
 
   // Fetch fresh data
   try {
-    const [channel, videos] = await Promise.all([
+    const [channel, { latestVideos, popularVideos }] = await Promise.all([
       fetchChannelStats(),
-      fetchLatestVideos(),
+      fetchVideos(),
     ]);
 
-    const result = { channel, videos };
+    const result = { channel, latestVideos, popularVideos };
     writeCache(result);
     return result;
   } catch (err) {
     console.error('[YouTubeService] API fetch failed:', err);
     // Fall back to stale cache if available, else hardcoded defaults
-    if (cache) return { channel: cache.channel, videos: cache.videos };
-    return { channel: FALLBACK_CHANNEL, videos: [] };
+    if (cache) {
+      return {
+        channel: cache.channel,
+        latestVideos: cache.latestVideos || cache.videos || [],
+        popularVideos: cache.popularVideos || [],
+      };
+    }
+    return { channel: FALLBACK_CHANNEL, latestVideos: [], popularVideos: [] };
   }
 }

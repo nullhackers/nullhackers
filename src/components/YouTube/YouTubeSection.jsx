@@ -33,7 +33,7 @@ const ClockIcon = () => (
 
 /* ═══════════════════════════════════════════════
    CUSTOM HOOK: useYouTubeData
-   Fetches channel stats + latest videos from the
+   Fetches channel stats + latest/popular videos from the
    YouTube Data API v3, with 12-hour localStorage cache.
    ═══════════════════════════════════════════════ */
 function useYouTubeData() {
@@ -46,7 +46,8 @@ function useYouTubeData() {
   })();
 
   const [channel, setChannel] = useState(cached?.channel || null);
-  const [videos, setVideos] = useState(cached?.videos || []);
+  const [latestVideos, setLatestVideos] = useState(cached?.latestVideos || cached?.videos || []);
+  const [popularVideos, setPopularVideos] = useState(cached?.popularVideos || []);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +57,8 @@ function useYouTubeData() {
         const data = await getYouTubeData();
         if (!cancelled) {
           setChannel(data.channel);
-          setVideos(data.videos);
+          setLatestVideos(data.latestVideos || []);
+          setPopularVideos(data.popularVideos || []);
         }
       } catch (err) {
         console.error('[YouTubeSection] Failed to load data:', err);
@@ -68,7 +70,7 @@ function useYouTubeData() {
     return () => { cancelled = true; };
   }, []);
 
-  return { channel, videos };
+  return { channel, latestVideos, popularVideos };
 }
 
 /* ═══════════════════════════════════════════════
@@ -186,9 +188,86 @@ function CreatorSection({ channel }) {
 }
 
 /* ═══════════════════════════════════════════════
+   VIDEO CARD (shared between both columns)
+   ═══════════════════════════════════════════════ */
+function VideoCard({ video, index }) {
+  return (
+    <a
+      href={`https://www.youtube.com/watch?v=${video.id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="yt-video-card glass"
+      style={{ animationDelay: `${index * 0.08}s` }}
+    >
+      {/* Thumbnail */}
+      <div className="yt-video-card__thumb">
+        <img
+          src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`}
+          alt={video.title}
+          className="yt-video-card__img"
+          loading="lazy"
+        />
+        <div className="yt-video-card__play">
+          <PlayIcon />
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div className="yt-video-card__body">
+        <h3 className="yt-video-card__title">{video.title}</h3>
+        <div className="yt-video-card__meta">
+          <span className="yt-video-card__views">
+            <EyeIcon />
+            {video.views}
+          </span>
+          {video.date && (
+            <span className="yt-video-card__date">
+              <ClockIcon />
+              {video.date}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* YouTube accent line */}
+      <div className="yt-video-card__accent" />
+    </a>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   ARROW ICON (for VIEW MORE button)
+   ═══════════════════════════════════════════════ */
+const ArrowRightIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+/* ═══════════════════════════════════════════════
+   FIRE / TRENDING ICON (for Popular Videos heading)
+   ═══════════════════════════════════════════════ */
+const FireIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+
+/* ═══════════════════════════════════════════════
+   CLOCK / LATEST ICON (for Latest Videos heading)
+   ═══════════════════════════════════════════════ */
+const LatestIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+/* ═══════════════════════════════════════════════
    VIDEO SHOWCASE SECTION
    ═══════════════════════════════════════════════ */
-function VideoShowcase({ videos }) {
+function VideoShowcase({ latestVideos, popularVideos, channelUrl }) {
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -201,7 +280,8 @@ function VideoShowcase({ videos }) {
     return () => observer.disconnect();
   }, []);
 
-  if (!videos || videos.length === 0) return null;
+  const hasVideos = (latestVideos && latestVideos.length > 0) || (popularVideos && popularVideos.length > 0);
+  if (!hasVideos) return null;
 
   return (
     <section className="yt-videos" id="youtube-videos" ref={sectionRef}>
@@ -217,51 +297,47 @@ function VideoShowcase({ videos }) {
           </p>
         </div>
 
-        {/* Video grid */}
-        <div className="yt-videos__grid">
-          {videos.map((video, i) => (
-            <a
-              key={video.id}
-              href={`https://www.youtube.com/watch?v=${video.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="yt-video-card glass"
-              style={{ animationDelay: `${i * 0.08}s` }}
-            >
-              {/* Thumbnail */}
-              <div className="yt-video-card__thumb">
-                <img
-                  src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`}
-                  alt={video.title}
-                  className="yt-video-card__img"
-                  loading="lazy"
-                />
-                <div className="yt-video-card__play">
-                  <PlayIcon />
-                </div>
-              </div>
+        {/* Row 1 — Latest Videos */}
+        {latestVideos && latestVideos.length > 0 && (
+          <div className="yt-videos__row">
+            <div className="yt-videos__row-header">
+              <LatestIcon />
+              <h3 className="yt-videos__row-title mono">Latest Videos</h3>
+            </div>
+            <div className="yt-videos__grid">
+              {latestVideos.map((video, i) => (
+                <VideoCard key={video.id} video={video} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
 
-              {/* Meta */}
-              <div className="yt-video-card__body">
-                <h3 className="yt-video-card__title">{video.title}</h3>
-                <div className="yt-video-card__meta">
-                  <span className="yt-video-card__views">
-                    <EyeIcon />
-                    {video.views}
-                  </span>
-                  {video.date && (
-                    <span className="yt-video-card__date">
-                      <ClockIcon />
-                      {video.date}
-                    </span>
-                  )}
-                </div>
-              </div>
+        {/* Row 2 — Popular Videos */}
+        {popularVideos && popularVideos.length > 0 && (
+          <div className="yt-videos__row">
+            <div className="yt-videos__row-header">
+              <FireIcon />
+              <h3 className="yt-videos__row-title mono">Popular Videos</h3>
+            </div>
+            <div className="yt-videos__grid">
+              {popularVideos.map((video, i) => (
+                <VideoCard key={video.id} video={video} index={i + 3} />
+              ))}
+            </div>
+          </div>
+        )}
 
-              {/* YouTube accent line */}
-              <div className="yt-video-card__accent" />
-            </a>
-          ))}
+        {/* VIEW MORE button */}
+        <div className="yt-videos__view-more-wrap">
+          <a
+            href={channelUrl || 'https://youtube.com/@nullhackers'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="yt-videos__view-more-btn"
+          >
+            <span>VIEW MORE</span>
+            <ArrowRightIcon />
+          </a>
         </div>
       </div>
     </section>
@@ -272,12 +348,16 @@ function VideoShowcase({ videos }) {
    COMBINED EXPORT
    ═══════════════════════════════════════════════ */
 export default function YouTubeSection() {
-  const { channel, videos } = useYouTubeData();
+  const { channel, latestVideos, popularVideos } = useYouTubeData();
 
   return (
     <>
       <CreatorSection channel={channel} />
-      <VideoShowcase videos={videos} />
+      <VideoShowcase
+        latestVideos={latestVideos}
+        popularVideos={popularVideos}
+        channelUrl={channel?.url}
+      />
     </>
   );
 }
