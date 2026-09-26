@@ -1,6 +1,6 @@
 export default function ScrollIndicator() {
   const handleClick = () => {
-    const target = document.getElementById('interactive-section');
+    const target = document.getElementById('youtube-creator');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     }
