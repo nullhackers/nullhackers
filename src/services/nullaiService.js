@@ -11,7 +11,7 @@
  */
 
 const NULLAI_API_BASE = 'https://nullaidb.onrender.com';
-const NULLAI_WEBSITE = 'https://nullaii.netlify.app';
+const NULLAI_WEBSITE = 'https://nullsi.vercel.app/';
 
 const CACHE_KEY = 'nullhackers_nullai_cache';
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
