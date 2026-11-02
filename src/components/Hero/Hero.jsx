@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import TerminalTypewriter from './TerminalTypewriter';
 import SocialLinks from './SocialLinks';
 import ScrollIndicator from './ScrollIndicator';
+import OrbitAnimation from './OrbitAnimation';
 import './Hero.css';
 
 export default function Hero() {
@@ -81,8 +82,9 @@ export default function Hero() {
       <canvas className="hero__stars" ref={canvasRef} />
       <div className="hero__glow hero__glow--blue" />
       <div className="hero__glow hero__glow--purple" />
-      <div className="hero__orbit hero__orbit--1" />
-      <div className="hero__orbit hero__orbit--2" />
+      
+      {/* Three-Circle Rotating Orbit Animation */}
+      <OrbitAnimation />
 
       {/* Content */}
       <div className={`hero__content ${phase >= 1 ? 'visible' : ''}`}>

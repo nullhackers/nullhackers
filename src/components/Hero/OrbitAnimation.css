@@ -1,0 +1,296 @@
+/* ==============================================================================
+   ORBIT ANIMATION CSS — Three-Circle Rotating Logo Animation
+   ============================================================================== */
+
+/* Master Orbit System Container */
+.hero-orbit-system {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 820px;
+  height: 820px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ambient central glow behind the orbits */
+.orbit-central-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(79, 140, 255, 0.08) 0%,
+    rgba(139, 92, 246, 0.05) 45%,
+    transparent 70%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Individual Orbital Ring Container */
+.orbit-ring-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--ring-diameter);
+  height: var(--ring-diameter);
+  border-radius: 50%;
+  border: 1px var(--ring-border-style) var(--ring-border-color);
+  box-shadow:
+    0 0 20px var(--ring-glow-color),
+    inset 0 0 20px var(--ring-glow-color);
+  pointer-events: none;
+}
+
+/* Rotating Track */
+.orbit-ring-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  will-change: transform;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Rotation keyframes */
+.orbit-rotate-cw {
+  animation-name: orbit-spin-cw;
+}
+
+.orbit-rotate-ccw {
+  animation-name: orbit-spin-ccw;
+}
+
+@keyframes orbit-spin-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-spin-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Icon Slot on the Circle Circumference */
+.orbit-icon-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 3;
+}
+
+/* 
+  Counter-Rotation Container
+  Counteracts the orbit's rotation so the logo remains visually upright at all times!
+*/
+.orbit-icon-upright {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.orbit-counter-rotate-cw {
+  animation-name: orbit-unspin-cw;
+}
+
+.orbit-counter-rotate-ccw {
+  animation-name: orbit-unspin-ccw;
+}
+
+@keyframes orbit-unspin-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes orbit-unspin-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glassmorphism Icon Badge */
+.orbit-icon-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(7, 11, 24, 0.85);
+  border: 1px solid rgba(79, 140, 255, 0.22);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    0 0 12px var(--icon-glow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+[data-theme="light"] .orbit-icon-badge {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(51, 102, 230, 0.22);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 0 12px var(--icon-glow);
+}
+
+/* Hover effect on logo badge */
+.orbit-icon-badge:hover {
+  transform: scale(1.18);
+  border-color: var(--icon-color);
+  box-shadow:
+    0 0 24px var(--icon-color),
+    0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+/* SVG image inside badge */
+.orbit-icon-img {
+  display: block;
+  max-width: 60%;
+  max-height: 60%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Fallback SVG icon */
+.orbit-icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.orbit-icon-fallback svg {
+  display: block;
+}
+
+/* Tooltip on hover */
+.orbit-icon-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(3, 5, 13, 0.92);
+  border: 1px solid var(--icon-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  z-index: 20;
+}
+
+[data-theme="light"] .orbit-icon-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  color: #0B1020;
+}
+
+.orbit-icon-badge:hover .orbit-icon-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==============================================================================
+   RESPONSIVE DESIGN BREAKPOINTS
+   Concentric scale scaling guarantees zero ellipse distortion & zero horizontal overflow
+   ============================================================================== */
+
+@media (max-width: 1200px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.82);
+  }
+}
+
+@media (max-width: 868px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.72);
+  }
+}
+
+@media (max-width: 680px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.58);
+  }
+  .orbit-icon-tooltip {
+    display: none; /* Hide tooltips on touch screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.46);
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-orbit-system {
+    transform: translate(-50%, -50%) scale(0.40);
+  }
+}
+
+/* ==============================================================================
+   ACCESSIBILITY & REDUCED MOTION
+   ============================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring-track,
+  .orbit-icon-upright {
+    animation: none !important;
+  }
+  .orbit-icon-badge {
+    transition: none !important;
+  }
+}
+

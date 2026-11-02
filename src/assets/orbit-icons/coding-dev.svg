@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Code brackets and slash -->
+  <polyline points="16 18 22 12 16 6" stroke="#3DFFB0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="8 6 2 12 8 18" stroke="#3DFFB0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="14" y1="4" x2="10" y2="20" stroke="#3DFFB0" stroke-width="2" stroke-linecap="round"/>
+  <!-- Terminal cursor dot -->
+  <circle cx="18" cy="12" r="1" fill="#3DFFB0"/>
+</svg>

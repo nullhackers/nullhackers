@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Compass outer circle -->
+  <circle cx="12" cy="12" r="9" stroke="#F59E0B" stroke-width="1.8"/>
+  <!-- Compass needle -->
+  <polygon points="12 6.5 14.5 12 12 11 9.5 12 12 6.5" fill="#F59E0B"/>
+  <polygon points="12 17.5 9.5 12 12 13 14.5 12 12 17.5" fill="rgba(245, 158, 11, 0.3)" stroke="#F59E0B" stroke-width="1"/>
+  <circle cx="12" cy="12" r="1.5" fill="#FFFFFF"/>
+  <!-- Discovery sparkle -->
+  <path d="M18 3.5l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#F59E0B"/>
+</svg>
